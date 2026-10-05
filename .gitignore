@@ -16,8 +16,8 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Personal preparation and local files
-支撑材料/ChemAI-面试话术包.md
+# Local-only notes
+/local-only/
 .env.*
 !.env.example
 *.log
