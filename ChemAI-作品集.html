@@ -1,0 +1,178 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ChemAI · AI 产品经理作品集</title><style>body{margin:0;background:#f5f6f3;color:#18352d;font:17px/1.8 system-ui,"Microsoft YaHei",sans-serif}main{max-width:960px;margin:40px auto;padding:40px;background:white;border-radius:18px}h1{font-size:42px;line-height:1.3}h2{margin-top:44px;border-top:1px solid #dde5de;padding-top:24px;font-size:25px}a{color:#126d55}blockquote{border-left:4px solid #39856c;margin-left:0;padding-left:20px;color:#476057}table{border-collapse:collapse;width:100%;font-size:15px;display:block;overflow:auto}th,td{border:1px solid #dbe4dc;padding:12px;text-align:left}th{background:#eef5ef}pre{background:#eff3f0;padding:18px;overflow:auto;border-radius:8px}code{font-size:.9em}li{margin:8px 0}.top{color:#587369;font-size:14px}@media(max-width:650px){main{margin:0;padding:22px;border-radius:0}h1{font-size:32px}}</style></head><body><main><p class="top">独立项目 · 原型与评测 · 2026-10 整理</p><h1>ChemAI · 智辅化学</h1>
+<blockquote>
+<p>面向高中化学教学的 AI 错因诊断原型：从题干与学生作答出发，探索生成附带作答依据和追问的错因假设，供教师复核。</p>
+</blockquote>
+<p><strong>个人独立项目 · AI 产品经理作品集</strong><br />
+项目覆盖：问题定义、需求拆解、产品设计、Agent 原型、Prompt 评测与迭代。</p>
+<p><strong>当前阶段：可运行原型与小样本实验。</strong> 尚未完成真实用户访谈、学校试点或教学效果验证。</p>
+<h2>1. 为什么做这个项目</h2>
+<p>判定一道题“对或错”之后，教师还需要判断学生在哪一步产生了偏差，才能组织讲评和后续练习。ChemAI 围绕这一场景，探索如何用 AI 辅助分析概念、审题和表达等可能的错误原因。</p>
+<p><strong>核心假设</strong>：带有学生作答依据、能说明不确定性的诊断建议，可以帮助教师形成更有针对性的讲评。这一价值判断仍需真实教师验证，目前不宣称已节省工时或提升成绩。</p>
+<p>产品将大模型用于理解非标准作答、生成候选解释与追问；最终教学判断由教师完成。提示词要求信息不足时优先请求补充过程，避免将猜测写成确定结论；实际遵循情况通过评测观察。</p>
+<h2>2. 原型做到了什么</h2>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>产品设计</th>
+<th>当前实现边界</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>教师端</td>
+<td>引用作答依据，给出错因假设与讲评建议</td>
+<td>支持文本对话与内置样例，未接入真实答题卡 OCR</td>
+</tr>
+<tr>
+<td>学生端</td>
+<td>通过提问引导思考，限制直接给答案</td>
+<td>已配置角色提示词与工具边界，不能保证所有输入下均不越界</td>
+</tr>
+<tr>
+<td>家长端</td>
+<td>通俗解释学习情况，限制排名类输出</td>
+<td>已实现角色化对话；档案工具使用示例数据，班级概览工具仅向教师端开放</td>
+</tr>
+</tbody>
+</table>
+<p>原型包含三端网页、REST 接口、角色路由、工具调用、<strong>最近 4 轮对话上下文</strong>、关键词知识库检索、输出风险标记与请求额度限制。服务使用 <strong>Python 标准库</strong>实现。</p>
+<p><strong>实现边界</strong>：最近对话上下文按会话和角色隔离，每个会话最多保留 8 条消息、每次最多带入 12,000 字符；会话只保存在内存，服务重启后丢失。工具调用有角色权限检查，但角色选择和会话 ID 都不等于身份鉴权；输出护栏只标记风险，仍返回原回答，尚未实现违规内容阻断。</p>
+<p>OCR、确定性化学方程式校验、真实班级数据、完整身份鉴权及教学反馈闭环属于后续规划。附录中的更完整技术架构也属于目标方案。</p>
+<h3>如何演示</h3>
+<p><strong>在线体验：</strong> <a href="https://chemai-study-demo.sleepearly26.chatgpt.site" target="_blank" rel="noopener">ChemAI 化学学习助手</a>（Worker 托管版；请勿输入真实学生个人信息）。</p>
+<ol>
+<li>在教师端选取内置样例，查看“关键差异—错因假设—需要补充的信息—讲评建议”。</li>
+<li>在同一端分两轮输入：先贴出题目和作答，再补充解题步骤，观察 AI 是否结合前文继续分析。</li>
+<li>切换家长端，观察语言表达与排名限制。</li>
+<li>对照评测中的失败案例，解释哪些输出还需要人工复核。</li>
+</ol>
+<p><a href="app/README.md">原型与运行说明</a> · <a href="app/index.html">网页界面</a> · <a href="app/agent/chemai_agent.py">Agent 实现</a></p>
+<p>本地启动（Python 3.10 或更新版本，在仓库根目录使用 PowerShell；仅首次运行时复制配置）：</p>
+<pre><code class="language-powershell">if (-not (Test-Path app/.env)) { Copy-Item app/.env.example app/.env }
+# 编辑 app/.env，填写自己的 API 密钥、服务地址和可用模型标识
+python app/server.py
+</code></pre>
+<p>启动后访问 <a href="http://127.0.0.1:8787">http://127.0.0.1:8787</a>。模型对话需要有效 API 配置；真实密钥不应提交到仓库。</p>
+<h2>3. 我负责的工作与关键取舍</h2>
+<p>本项目由个人独立推进，覆盖问题与场景定义、需求和交互设计、可运行原型及评测材料的组织。文档撰写与交叉校验使用了 AI 辅助；个人项目不代表已有学校合作或团队交付经历。</p>
+<table>
+<thead>
+<tr>
+<th>产品决策</th>
+<th>选择与理由</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>缩小验证范围</td>
+<td>以文本错因分析与有限对话上下文为当前验证入口，OCR 与教学闭环列为后续规划</td>
+</tr>
+<tr>
+<td>保留教师判断</td>
+<td>让模型输出假设、依据与追问，避免直接下学生能力或态度结论</td>
+</tr>
+<tr>
+<td>区分三端需求</td>
+<td>教师侧辅助复核，学生侧引导思考，家长侧解释学习情况</td>
+</tr>
+<tr>
+<td>拆开质量指标</td>
+<td>分别观察规则合规、裁判判断与响应延迟，避免用单个通过率代替产品质量</td>
+</tr>
+</tbody>
+</table>
+<h2>4. 评测证据：v1 → v2</h2>
+<p>使用 <strong>15 条自建样例</strong>，v1、v2 各重复运行 3 轮，每版累计 45 次输出。重复运行用于观察波动，<strong>不等于 45 条独立样本</strong>。</p>
+<p>v1 为刻意设置的宽松基线；v2 在教师端提示中明确证据引用、信息不足追问和固定结构要求。两版都由 Agent 追加角色规则与工具协议，因此 v1 不是完全无约束的模型。</p>
+<p><strong>实验条件</strong>：评测输入包含题目、参考答案、学生作答和预先标注的歧义类型。这验证的是已提供参考信息下的辅助分析，不能据此证明模型能独立发现信息缺失。v1 未被要求使用四段结构，因此结构指标的提升主要说明新增格式要求得到遵循，不能单独作为诊断能力提升的证据。</p>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th style="text-align: right;">v1</th>
+<th style="text-align: right;">v2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>四个指定小节关键词齐全率</td>
+<td style="text-align: right;">0/45（0%）</td>
+<td style="text-align: right;">45/45（100%）</td>
+</tr>
+<tr>
+<td>输出含引号比例（引用代理信号）</td>
+<td style="text-align: right;">41/45（91.1%）</td>
+<td style="text-align: right;">45/45（100%）</td>
+</tr>
+<tr>
+<td>缺信息子集中追问关键词命中率</td>
+<td style="text-align: right;">9/12（75%）</td>
+<td style="text-align: right;">12/12（100%）</td>
+</tr>
+<tr>
+<td>LLM 裁判通过率</td>
+<td style="text-align: right;">82.2%</td>
+<td style="text-align: right;">88.9%</td>
+</tr>
+<tr>
+<td>平均模型调用累计耗时</td>
+<td style="text-align: right;">2.04 秒</td>
+<td style="text-align: right;">3.59 秒</td>
+</tr>
+</tbody>
+</table>
+<p><strong>结果解读</strong>：在这组样例中，v2 更稳定地满足预设输出要求，但模型调用耗时也增加。规则只检测小节关键词、引号和追问关键词，未验证引用是否确实来自学生原文，也未验证追问是否有效。LLM 裁判通过率为 37/45 → 40/45，尚无教师人工金标准支持准确率结论。这些历史单轮评测没有覆盖新加入的多轮上下文功能。耗时为每条样例内模型调用时间之和，不含裁判、前端和完整服务处理时间。</p>
+<p>数据从下列六轮原始记录汇总复核，本次检查未重新调用模型：v1 为 <code>021711</code>、<code>021755</code>、<code>021842</code>，v2 为 <code>021927</code>、<code>022038</code>、<code>022144</code>（目录日期均为 <code>20261005</code>）。耗时按原始记录直接平均，统计口径见实验汇总。原始报告记录请求模型标识为 <code>deepseek-chat</code>；实际底层模型版本应另行核验，复跑时需保留返回模型标识与调用日期。</p>
+<p><strong>关键实验入口</strong>：</p>
+<ul>
+<li><a href="eval/实验结果汇总.md">实验汇总与六轮索引</a></li>
+<li><a href="eval/runs/20261005-021842_v1/report.md">v1 单轮报告</a> · <a href="eval/runs/20261005-022144_v2/report.md">v2 单轮报告</a></li>
+<li><a href="eval/runs/20261005-022144_v2/results.jsonl">v2 原始输出</a> · <a href="eval/cases.jsonl">评测样例</a> · <a href="eval/README.md">复跑指南</a></li>
+</ul>
+<h2>5. 迭代复盘与下一步</h2>
+<p><strong>已观察到的问题</strong>：v2 报告中仍有 C03、C09 等未通过项，涉及缺条件判断、等价表述与证据使用。应同时检查模型原始输出和裁判理由，不能把所有失败都归咎于模型，也不能一概解释为裁判误判。</p>
+<p><strong>本轮观察</strong>：更明确的提示约束伴随着更稳定的输出形式和更长的模型调用耗时；尚未通过独立测试集验证这一变化是否能泛化。对教师是否更有帮助、等待时间是否可接受，还需要实际体验反馈。</p>
+<p><strong>下一步按优先级验证</strong>：</p>
+<ol>
+<li>邀请少量高中化学教师完成访谈和样例试用，记录当前做法、复核耗时、采纳与驳回原因。</li>
+<li>扩充独立评测样例，增加正确作答、缺失过程、等价表述及诱导越界情形；区分调试样例与留出测试样例，并增加不提供歧义标签的对照实验。</li>
+<li>引入教师人工复核，分别衡量化学正确性、证据充分性与建议可用性，再决定功能扩展。</li>
+</ol>
+<p>以上均为待执行计划；目前不报告用户增长、付费转化、工时节省或成绩提升成果。</p>
+<h2>6. 核心产品文档</h2>
+<p>推荐按“需求 → 流程 → 复盘”阅读，无需通读全部方案：</p>
+<table>
+<thead>
+<tr>
+<th>文档</th>
+<th>阅读重点</th>
+<th>状态说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="ChemAI-交付文档/PRD-ChemAI.md">产品 PRD</a></td>
+<td>问题、目标用户、方案与范围</td>
+<td>描述当前原型范围、验收口径与后续优先级</td>
+</tr>
+<tr>
+<td><a href="ChemAI-交付文档/flows.md">核心流程</a></td>
+<td>角色、数据流与 Agent 行为</td>
+<td>区分当前对话链路与后续教学闭环</td>
+</tr>
+<tr>
+<td><a href="ChemAI-交付文档/迭代复盘.md">迭代复盘</a></td>
+<td>实验发现、取舍与后续验证</td>
+<td>基于已有评测，不将团队管理设想写成已发生经历</td>
+</tr>
+</tbody>
+</table>
+<h2>7. 附录：按需深入阅读</h2>
+<ul>
+<li><a href="产品探索补充材料/README.md">产品探索补充材料</a>：机会树与假设验证计划，尚未通过真实用户验证。</li>
+<li><a href="ChemAI-交付文档/README.md">核心交付文档索引</a>：PRD、流程、架构、权限和评测缺口。</li>
+<li><a href="支撑材料/ChemAI-用户访谈提纲.md">用户访谈提纲</a>：后续需求验证工具，尚无已完成访谈记录。</li>
+<li><a href="ChemAI-作品集.html">静态作品集网页</a>：下载后可在浏览器打开；GitHub 文件页展示源码。</li>
+</ul>
+<p>项目材料已精简为实现、评测、核心产品文档和两份探索补充。面试话术保留在本地准备材料中，已加入 Git 忽略规则。</p></main></body></html>

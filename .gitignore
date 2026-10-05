@@ -1,0 +1,27 @@
+# ===== 环境变量与密钥（勿上传）=====
+.env
+*.env
+!.env.example
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# ===== 系统 / 编辑器 =====
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Personal preparation and local files
+支撑材料/ChemAI-面试话术包.md
+.env.*
+!.env.example
+*.log
+.tmp/
+
+# Local app credentials
+/app/.env

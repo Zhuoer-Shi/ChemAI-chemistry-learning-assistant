@@ -1,0 +1,13 @@
+{
+  "开始时间": "2026-10-05T02:14:32",
+  "标记": "v2",
+  "运行模式": "Agent 链路（persona+工具+状态）",
+  "模型": "deepseek-chat",
+  "接口": "https://api.deepseek.com/v1",
+  "温度": 0.2,
+  "prompt文件": "eval\\prompts\\system_v2.md",
+  "prompt_sha256": "33347b6e0a6ed662",
+  "样例数": 15,
+  "样例文件": "eval\\cases.jsonl",
+  "裁判": "开启"
+}
