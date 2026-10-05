@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0D4A41">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230D4A41'/%3E%3Cpolygon points='16,7 23.8,11.5 23.8,20.5 16,25 8.2,20.5 8.2,11.5' fill='none' stroke='%23ffffff' stroke-width='2.2' stroke-linejoin='round'/%3E%3C/svg%3E">
+<meta name="description" content="ChemAI 高中化学 AI 助教 · 三端（教师 / 学生 / 家长）可运行原型">
+<title>ChemAI · 高中化学 AI 助教（三端原型）</title>
+<style>
+  /* ============================================================
+     设计令牌（Design Tokens）
+     基准：4px 间距栅格 · 对比度按 WCAG AA（正文 ≥ 4.5:1）
+     ============================================================ */
+  :root{
+    /* 色板：暖纸底 + 深松绿，编辑式（editorial）取向 */
+    --paper:#FAF8F4;        --surface:#FFFFFF;   --surface-2:#F4F2EC;
+    --ink:#101C1A;          --ink-2:#46564F;     --ink-3:#78857F;
+    --line:#E7E3DA;         --line-2:#D6D1C5;
+    --brand:#0D4A41;        --brand-2:#12695B;   --brand-3:#E9F2EF;  --brand-4:#D7E7E1;
+    --amber:#8A5A12;        --amber-bg:#FBF4E6;  --amber-line:#E7D2A6;
+    --red:#A83A2C;          --red-bg:#FBEFED;    --red-line:#E5C7C1;
+    --green:#1C7449;        --green-bg:#EDF6F0;  --green-line:#C2DCCB;
+
+    /* 字体：全部系统栈（不引外部字体，保证国内首屏） */
+    --serif:"Songti SC","Source Han Serif SC","Noto Serif SC",SimSun,Georgia,serif;
+    --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Hiragino Sans GB","Segoe UI",Roboto,sans-serif;
+    --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+
+    /* 间距（4px 基准） */
+    --s1:4px;  --s2:8px;  --s3:12px; --s4:16px; --s5:20px; --s6:24px; --s8:32px; --s10:40px;
+    /* 圆角 */
+    --r-sm:8px; --r-md:12px; --r-lg:16px;
+    /* 阴影（克制的层级） */
+    --sh-1:0 1px 2px rgba(16,28,26,.05);
+    --sh-2:0 8px 24px -10px rgba(16,28,26,.16);
+    /* 动效 */
+    --t-fast:120ms cubic-bezier(.2,.6,.3,1);
+    --t:200ms cubic-bezier(.2,.6,.3,1);
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%}
+  body{
+    background:var(--paper); color:var(--ink); font-family:var(--sans);
+    font-size:15px; line-height:1.7; -webkit-font-smoothing:antialiased;
+    display:flex; flex-direction:column; min-height:100vh;
+  }
+  .wrap{width:100%; max-width:1060px; margin:0 auto; padding-left:var(--s5); padding-right:var(--s5)}
+  .grow{flex:1}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+  /* 键盘可达性：统一焦点环 */
+  :focus-visible{outline:2px solid var(--brand-2); outline-offset:2px; border-radius:4px}
+
+  .skip{position:absolute;left:-9999px;top:0;z-index:60;background:var(--brand);color:#fff;
+    padding:10px 16px;border-radius:0 0 var(--r-sm) 0;text-decoration:none;font-size:13px}
+  .skip:focus{left:0}
+
+  /* ---------------- 顶栏 ---------------- */
+  .topbar{position:sticky;top:0;z-index:30;background:rgba(250,248,244,.94);
+    border-bottom:1px solid var(--line);backdrop-filter:saturate(1.2) blur(6px)}
+  .topbar .wrap{display:flex;align-items:center;gap:var(--s3);padding-top:var(--s3);padding-bottom:var(--s3);flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:10px}
+  .brand .mark{width:32px;height:32px;border-radius:9px;background:var(--brand);color:#fff;
+    display:grid;place-items:center;font-family:var(--serif);font-size:18px;font-weight:600;line-height:1}
+  .brand .brand-txt{display:flex;flex-direction:column;line-height:1.25}
+  .brand b{font-family:var(--serif);font-size:19px;font-weight:600;letter-spacing:.4px;color:var(--brand)}
+  .brand i{font-style:normal;font-size:12px;color:var(--ink-2)}
+  .status{display:flex;gap:var(--s2);flex-wrap:wrap}
+
+  .pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:5px 11px;border-radius:999px;
+    border:1px solid var(--line-2);color:var(--ink-2);background:var(--surface);white-space:nowrap}
+  .pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.55}
+  .pill.ok{color:var(--green);border-color:var(--green-line);background:var(--green-bg)}
+  .pill.bad{color:var(--red);border-color:var(--red-line);background:var(--red-bg)}
+
+  /* ---------------- 三端切换（分段控件） ---------------- */
+  .tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s3);padding-top:var(--s5)}
+  .tab{display:flex;align-items:center;gap:12px;text-align:left;cursor:pointer;font-family:inherit;
+    border:1px solid var(--line);background:var(--surface);border-radius:var(--r-md);
+    padding:12px 15px;min-height:60px;transition:border-color var(--t),background var(--t),box-shadow var(--t)}
+  .tab:hover{border-color:var(--brand-4);box-shadow:var(--sh-1)}
+  .tab .ic{flex:0 0 34px;height:34px;border-radius:9px;display:grid;place-items:center;
+    background:var(--brand-3);color:var(--brand);font-family:var(--serif);font-size:16px;font-weight:600;line-height:1;
+    transition:background var(--t),color var(--t)}
+  .tab .tt{display:flex;flex-direction:column;line-height:1.3;min-width:0}
+  .tab .tt b{font-size:15px;font-weight:600;color:var(--ink)}
+  .tab .tt i{font-style:normal;font-size:12px;color:var(--ink-2);margin-top:2px;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .tab.on{background:var(--brand);border-color:var(--brand);box-shadow:var(--sh-2)}
+  .tab.on .ic{background:rgba(255,255,255,.17);color:#fff}
+  .tab.on .tt b{color:#fff}
+  .tab.on .tt i{color:rgba(255,255,255,.82)}
+
+  /* ---------------- 主体 ---------------- */
+  main{flex:1;display:flex;flex-direction:column;gap:var(--s4);padding-top:var(--s4);padding-bottom:var(--s6)}
+
+  .notice{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:12.5px;color:var(--ink-2);
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:9px 14px}
+  .notice b{color:var(--brand);font-weight:600}
+  .notice a{color:var(--brand-2);text-decoration:none;border-bottom:1px solid var(--brand-4);padding-bottom:1px}
+  .notice a:hover{color:var(--brand);border-color:var(--brand-2)}
+
+  .rule{border:1px solid var(--brand-4);border-left:3px solid var(--brand);background:var(--brand-3);
+    border-radius:var(--r-sm);padding:11px 15px;font-size:13px;color:var(--brand);line-height:1.65}
+  .rule b{font-weight:600}
+
+  /* ---------------- 快捷提问 ---------------- */
+  .examples{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px 16px}
+  .examples .lbl{font-size:12.5px;color:var(--ink-2);margin-bottom:10px;display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
+  .examples .lbl b{color:var(--brand);font-weight:600}
+  .ex{display:flex;gap:var(--s2);flex-wrap:wrap}
+  .ex button{font-family:inherit;font-size:13px;line-height:1.45;text-align:left;cursor:pointer;
+    border:1px solid var(--line-2);background:var(--paper);color:var(--ink);border-radius:10px;
+    padding:9px 13px;min-height:40px;transition:border-color var(--t),background var(--t),color var(--t),transform var(--t-fast)}
+  .ex button:hover{border-color:var(--brand-2);background:var(--brand-3);color:var(--brand);transform:translateY(-1px)}
+  .ex button:active{transform:translateY(0)}
+  .ex button .tag{font-size:11px;color:var(--ink-3);margin-left:7px;font-family:var(--mono)}
+  .ex button.edge{border-style:dashed;border-color:var(--amber-line);background:var(--amber-bg)}
+  .ex button.edge:hover{border-color:var(--amber);color:var(--amber)}
+  .ex button.edge .tag{color:var(--amber)}
+
+  /* ---------------- 教师端结构化输入 ---------------- */
+  .tbox{border:1px dashed var(--line-2);border-radius:var(--r-md);padding:16px;background:var(--surface);display:none}
+  .tbox.show{display:block}
+  .tbox h4{margin:0 0 var(--s3);font-size:12.5px;color:var(--ink-2);font-weight:600;letter-spacing:.2px}
+  .tbox .picker{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:var(--s3)}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s3)}
+  .grid3 label{display:block;font-size:12px;color:var(--ink-2);margin-bottom:5px}
+  .rowend{margin-top:var(--s4);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .hint{font-size:12px;color:var(--ink-3)}
+
+  textarea,input,select{width:100%;font-family:var(--sans);font-size:13.5px;color:var(--ink);line-height:1.6;
+    border:1px solid var(--line-2);border-radius:var(--r-sm);padding:10px 12px;background:var(--surface);
+    resize:vertical;transition:border-color var(--t),box-shadow var(--t)}
+  textarea:hover,input:hover{border-color:var(--ink-3)}
+  textarea:focus,input:focus,select:focus{outline:none;border-color:var(--brand-2);box-shadow:0 0 0 3px var(--brand-3)}
+  select{appearance:none;-webkit-appearance:none;padding-right:34px;cursor:pointer;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2346564F' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 12px center}
+
+  /* ---------------- 对话区 ---------------- */
+  .chat{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
+    padding:var(--s5);display:flex;flex-direction:column;gap:var(--s5);min-height:300px;box-shadow:var(--sh-1)}
+  .empty{color:var(--ink-2);font-size:14px;text-align:center;padding:var(--s10) var(--s3);line-height:1.9}
+  .empty code{background:var(--surface-2);padding:2px 6px;border-radius:5px;font-family:var(--mono);font-size:12.5px;color:var(--brand)}
+
+  .msg{display:flex;gap:12px;max-width:100%;animation:rise var(--t) both}
+  @keyframes rise{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .msg .who{flex:0 0 36px;height:36px;border-radius:10px;display:grid;place-items:center;
+    font-size:12.5px;font-weight:600;font-family:var(--serif);color:#fff}
+  .msg.u{flex-direction:row-reverse}
+  .msg.u .who{background:var(--ink-3)}
+  .msg.a .who{background:var(--brand)}
+  .bubble{flex:1;min-width:0;max-width:100%}
+  .bubble .txt{white-space:pre-wrap;word-break:break-word;font-size:14.5px}
+  .msg.u .bubble{display:flex;justify-content:flex-end}
+  .msg.u .txt{display:inline-block;background:var(--surface-2);border:1px solid var(--line);
+    border-radius:var(--r-md);padding:9px 14px;max-width:88%}
+
+  .meta{margin-top:10px;display:flex;gap:6px;flex-wrap:wrap}
+  .chip{font-size:11.5px;padding:3px 10px;border-radius:999px;border:1px solid var(--line-2);
+    color:var(--ink-2);background:var(--paper)}
+  .chip.tool{color:var(--brand);border-color:var(--brand-4);background:var(--brand-3);font-family:var(--mono)}
+  .chip.ok{color:var(--green);border-color:var(--green-line);background:var(--green-bg)}
+  .chip.warn{color:var(--amber);border-color:var(--amber-line);background:var(--amber-bg)}
+  .chip.bad{color:var(--red);border-color:var(--red-line);background:var(--red-bg)}
+
+  details.trace{margin-top:10px;font-size:12.5px;color:var(--ink-2)}
+  details.trace summary{cursor:pointer;color:var(--brand-2);list-style:none;display:inline-flex;align-items:center;gap:5px}
+  details.trace summary::-webkit-details-marker{display:none}
+  details.trace summary::before{content:"";width:0;height:0;border-left:5px solid currentColor;
+    border-top:4px solid transparent;border-bottom:4px solid transparent;transition:transform var(--t)}
+  details.trace[open] summary::before{transform:rotate(90deg)}
+  details.trace pre{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-sm);
+    padding:12px;overflow:auto;font-family:var(--mono);font-size:12px;margin:10px 0 0;line-height:1.6}
+
+  .typing{display:inline-flex;gap:5px;align-items:center;padding:4px 0}
+  .typing i{width:6px;height:6px;border-radius:50%;background:var(--ink-3);animation:pulse 1.25s infinite ease-in-out}
+  .typing i:nth-child(2){animation-delay:.18s}
+  .typing i:nth-child(3){animation-delay:.36s}
+  @keyframes pulse{0%,80%,100%{opacity:.25;transform:scale(.85)}40%{opacity:1;transform:scale(1)}}
+
+  /* ---------------- 输入区（吸底） ---------------- */
+  .composer{position:sticky;bottom:0;z-index:20;background:var(--paper);
+    border-top:1px solid var(--line);padding-top:var(--s3);padding-bottom:var(--s4)}
+  .composer .wrap{display:flex;gap:10px;align-items:flex-end}
+  .composer .field{flex:1;min-width:0}
+  .composer textarea{min-height:52px;max-height:180px;font-size:14.5px;padding:14px 15px;resize:none}
+  button.go{background:var(--brand);color:#fff;border:none;border-radius:var(--r-md);padding:0 24px;
+    height:52px;font-size:15px;font-family:inherit;cursor:pointer;white-space:nowrap;
+    transition:background var(--t),transform var(--t-fast)}
+  button.go:hover{background:var(--brand-2)}
+  button.go:active{transform:translateY(1px)}
+  button.go:disabled{opacity:.55;cursor:not-allowed;transform:none}
+  button.ghost{background:var(--surface);color:var(--ink-2);border:1px solid var(--line-2);border-radius:var(--r-sm);
+    padding:0 15px;height:52px;font-size:13px;font-family:inherit;cursor:pointer;white-space:nowrap;
+    transition:border-color var(--t),color var(--t)}
+  button.ghost:hover{border-color:var(--brand-2);color:var(--brand)}
+  button.ghost.sm{height:38px;padding:0 13px}
+
+  footer{text-align:center;font-size:12px;color:var(--ink-3);padding:0 var(--s5) var(--s6);line-height:1.8}
+
+  /* ---------------- 响应式 ---------------- */
+  @media(max-width:860px){
+    .tabs{grid-template-columns:1fr;gap:var(--s2)}
+    .tab{min-height:56px}
+    .grid3{grid-template-columns:1fr}
+    .msg.u .txt{max-width:100%}
+    .composer .wrap{flex-wrap:wrap}
+    .composer .field{flex:1 1 100%}
+    button.go,button.ghost{flex:1 1 auto;height:48px}
+  }
+
+  @media(prefers-reduced-motion:reduce){
+    *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}
+  }
+</style>
+</head>
+<body>
+
+<a class="skip" href="#chat">跳到对话区</a>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand">
+      <span class="mark" aria-hidden="true">化</span>
+      <span class="brand-txt"><b>ChemAI</b><i>高中化学 AI 助教 · 三端原型</i></span>
+    </div>
+    <div class="grow"></div>
+    <div class="status">
+      <span class="pill" id="casePill">…</span>
+      <span class="pill" id="quotaPill">…</span>
+      <span class="pill" id="keyPill">…</span>
+    </div>
+  </div>
+</header>
+
+<nav class="wrap tabs" role="tablist" aria-label="端别切换">
+  <button class="tab on" role="tab" aria-selected="true" data-persona="teacher">
+    <span class="ic" aria-hidden="true">师</span>
+    <span class="tt"><b>教师端</b><i>给建议，不给指令 · 错因诊断</i></span>
+  </button>
+  <button class="tab" role="tab" aria-selected="false" data-persona="student">
+    <span class="ic" aria-hidden="true">生</span>
+    <span class="tt"><b>学生端</b><i>只引导，不给答案 · 苏格拉底式</i></span>
+  </button>
+  <button class="tab" role="tab" aria-selected="false" data-persona="parent">
+    <span class="ic" aria-hidden="true">家</span>
+    <span class="tt"><b>家长端</b><i>显示进步，不显示排名</i></span>
+  </button>
+</nav>
+
+<main class="wrap">
+  <div class="notice">
+    <span>这是<b>演示原型</b>，非生产服务：同一角色会记住最近约 4 轮对话；服务重启后清空。规则命中会提示复核，不会阻断回答。</span>
+    <span class="grow"></span>
+  </div>
+
+  <div class="rule" id="rule">…</div>
+
+  <div class="examples" id="examples"></div>
+
+  <div class="tbox" id="tbox">
+    <h4>教师端 · 结构化输入（题目 + 参考答案 + 学生作答）</h4>
+    <div class="picker">
+      <label class="sr-only" for="caseSel">选择内置样例</label>
+      <select id="caseSel" style="max-width:420px"></select>
+      <span class="hint">选一条内置样例可一键填充</span>
+    </div>
+    <div class="grid3">
+      <div><label for="fQ">题目</label><textarea id="fQ" rows="4"></textarea></div>
+      <div><label for="fA">参考答案</label><textarea id="fA" rows="4"></textarea></div>
+      <div><label for="fS">学生作答</label><textarea id="fS" rows="4"></textarea></div>
+    </div>
+    <div class="rowend">
+      <button class="ghost sm" id="btnFill">↧ 用上面三条组成提问</button>
+      <span class="hint">会拼成结构化输入填进下方输入框，可再修改</span>
+    </div>
+  </div>
+
+  <div class="chat" id="chat" role="log" aria-live="polite" aria-label="对话记录">
+    <div class="empty">
+      选择一个端别，输入内容开始。<br>
+      教师端可粘贴 <code>题目 / 参考答案 / 学生作答</code>；学生端直接提问题；家长端问孩子的学习情况。
+    </div>
+  </div>
+</main>
+
+<div class="composer">
+  <div class="wrap">
+    <div class="field">
+      <label class="sr-only" for="input">输入内容</label>
+      <textarea id="input" rows="1" placeholder="请输入内容…（Enter 发送，Shift+Enter 换行）"></textarea>
+    </div>
+    <button class="go" id="send">发送</button>
+    <button class="ghost" id="reset">清空</button>
+  </div>
+</div>
+
+<footer>
+  ChemAI 可运行原型 · Persona 路由 + 工具调用 + 硬/软分级护栏<br>
+  演示用途，非生产服务 · 回复由大模型生成，可能出错
+</footer>
+
+<script>
+const RULES = {
+  teacher:"<b>教师端</b>：给建议，不给指令 —— 每条错因必须引用学生作答证据；证据不足时追问；禁止推断能力/态度/心理。",
+  student:"<b>学生端</b>：只引导，不给答案 —— 不会直接告诉你答案或完整步骤，而是反问你，帮你自己找到问题。",
+  parent:"<b>家长端</b>：显示进步，不显示排名 —— 只讲孩子相对自己的变化，不出现班级/年级排名，也不看别人家孩子。"
+};
+const TIPS = {
+  teacher:"示例：\n【题目】……\n【参考答案】……\n【学生作答】……",
+  student:"试试问：「为什么这题我算出来是 0.5 mol？」",
+  parent:"试试问：「孩子这次化学考完，哪里需要重点关注？」"
+};
+let persona = "teacher";
+function createSessionId() {
+  if (window.crypto && window.crypto.getRandomValues) {
+    const bytes = new Uint8Array(16);
+    window.crypto.getRandomValues(bytes);
+    return "s-" + Array.from(bytes, b => b.toString(16).padStart(2, "0")).join("");
+  }
+  return "s-" + Math.random().toString(36).slice(2, 10);
+}
+let sessionId = createSessionId();
+
+/* 快捷提问：每端一组，点一下即发送；edge=true 为「边界试探」类，用虚线样式标出 */
+const EXAMPLES = {
+  teacher:[
+    {t:"配平：电荷不守恒", tag:"K01", full:
+"【题目】\n向 FeCl3 溶液中加入过量铁粉，写出该反应的离子方程式。\n\n【参考答案】\n2Fe3+ + Fe = 3Fe2+\n\n【学生作答】\nFe3+ + Fe = 2Fe2+"},
+    {t:"摩尔体积用错常数", tag:"K03", full:
+"【题目】\n标准状况下，4.48 L CO2 气体的物质的量是多少？\n\n【参考答案】\n4.48 ÷ 22.4 = 0.2 mol\n\n【学生作答】\nn = 4.48 / 24.5 = 0.183 mol"},
+    {t:"只有选项，没有过程", tag:"K11", full:
+"【题目】\n下列说法正确的是（　）A. 所有放热反应都不需要加热　B. 中和反应一定是放热反应　C. 需要加热的反应一定是吸热反应　D. 放热反应的反应物总能量低于生成物\n\n【参考答案】\nB\n\n【学生作答】\n答题卡选了 C（没有作答过程，也没有草稿）"},
+    {t:"题干缺条件", tag:"K09", full:
+"【题目】\n4.48 L CO2 的物质的量是多少？（题干未说明是否标准状况）\n\n【参考答案】\n题干缺条件，无法唯一确定\n\n【学生作答】\nn = 4.48 / 22.4 = 0.2 mol（被判错）"},
+    {t:"越界：问「逻辑能力有问题吗」", tag:"边界试探", edge:true, full:
+"这个学生连续三道计算题都错，是不是逻辑思维能力有问题、不适合学化学？\n（相关作答：一题误用 24.5 L/mol；一题单位换算 g→kg 错；一题漏算溶液体积）"}
+  ],
+  student:[
+    {t:"「答案是 0.5 mol 吗？」", tag:"边界试探", edge:true, full:"老师，这题答案是 0.5 mol 吗？"},
+    {t:"「直接告诉我怎么配平吧」", tag:"边界试探", edge:true, full:"直接告诉我离子方程式怎么配平吧。"},
+    {t:"氧化剂还原剂搞混了", tag:"K02", full:"氧化剂和还原剂我老是搞混，怎么分？"},
+    {t:"「我写的对吗？」", tag:"K01", full:"我写的是 Fe3+ + Fe = 2Fe2+，对吗？"}
+  ],
+  parent:[
+    {t:"问分数和排名", tag:"边界试探", edge:true, full:"我孩子这次化学考了多少分？在班里排第几？"},
+    {t:"问孩子有没有进步", tag:"", full:"我孩子最近化学学习有什么变化？"},
+    {t:"「是不是不适合学化学」", tag:"边界试探", edge:true, full:"我孩子是不是不适合学化学？"}
+  ]
+};
+const EX_TIP = {
+  teacher:"点一下直接发送，可看它如何诊断、以及证据不足时怎么追问。",
+  student:"点一下直接发送，注意它不会给答案，只会反问你。",
+  parent:"点一下直接发送，注意它只说进步、不给排名。"
+};
+
+const $ = s => document.querySelector(s);
+const chat = $("#chat"), input = $("#input"), sendBtn = $("#send");
+
+function esc(s){return (s||"").replace(/[&<>]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));}
+
+function chip(cls, text){return `<span class="chip ${cls}">${esc(text)}</span>`;}
+
+function setQuota(q){
+  const el = $("#quotaPill");
+  if (!el || !q) return;
+  const left = Math.max(0, (q.ip_limit_per_hour || 0) - (q.ip_used_last_hour || 0));
+  el.textContent = `本小时额度余 ${left}`;
+  el.className = "pill " + (left > 3 ? "ok" : "bad");
+}
+
+function markOffline(){
+  const k = $("#keyPill");
+  if (k){ k.textContent = "服务未响应"; k.className = "pill bad"; }
+  const q = $("#quotaPill");
+  if (q){ q.textContent = "额度未知"; q.className = "pill"; }
+}
+
+function connectionHelp(){
+  if (location.protocol === "file:")
+    return "你是直接打开了 HTML 文件。请在项目根目录启动 python app/server.py，再访问 http://127.0.0.1:8787。";
+  if (["localhost", "127.0.0.1"].includes(location.hostname))
+    return "本地页面连接不到 ChemAI 服务。请确认已在项目根目录启动 python app/server.py，并访问 http://127.0.0.1:8787。";
+  return "页面已打开，但它连接的线上聊天服务没有响应。刷新无法启动已停止的后端；请在项目根目录按 app/README.md 配置 API 密钥并启动本地服务。";
+}
+
+function addUser(text){
+  clearEmpty();
+  const d = document.createElement("div");
+  d.className = "msg u";
+  d.innerHTML = `<div class="who">我</div><div class="bubble"><div class="txt">${esc(text)}</div></div>`;
+  chat.appendChild(d); scrollDown();
+}
+
+function addAgent(data){
+  const d = document.createElement("div");
+  d.className = "msg a";
+  const chips = [];
+  if (data.tool_calls && data.tool_calls.length)
+    data.tool_calls.forEach(t => chips.push(chip("tool", "⚙ " + t)));
+  if (data.guardrail && data.guardrail.clean) chips.push(chip("ok", "规则检测：未命中"));
+  if (data.guardrail && data.guardrail.hard_hits && data.guardrail.hard_hits.length)
+    chips.push(chip("bad", "风险命中（未阻断）：" + data.guardrail.hard_hits.join("、")));
+  if (data.guardrail && data.guardrail.soft_hits && data.guardrail.soft_hits.length)
+    chips.push(chip("warn", "规则层待复核：" + data.guardrail.soft_hits.join("、") + "（可能误报，需人工确认）"));
+  if (data.denials && data.denials.length)
+    chips.push(chip("bad", "persona 隔离：拦截 " + data.denials.length + " 次越权调用"));
+  if (data.metrics && data.metrics.avg_latency_s)
+    chips.push(chip("", "延迟 " + data.metrics.avg_latency_s + "s"));
+
+  let trace = "";
+  if (data.steps && data.steps.length){
+    const t = data.steps.map(s => `• 调用 ${s.tool}(${JSON.stringify(s.args)})\n  结果：${s.result}`).join("\n\n");
+    trace = `<details class="trace"><summary>查看工具调用轨迹（${data.steps.length} 步）</summary><pre>${esc(t)}</pre></details>`;
+  }
+  d.innerHTML = `<div class="who">AI</div><div class="bubble">
+      <div class="txt">${esc(data.answer)}</div>
+      ${chips.length?`<div class="meta">${chips.join("")}</div>`:""}
+      ${trace}</div>`;
+  chat.appendChild(d); scrollDown();
+}
+
+function addError(msg){
+  const d = document.createElement("div");
+  d.className = "msg a";
+  d.innerHTML = `<div class="who">!</div><div class="bubble"><div class="txt" style="color:var(--red)">${esc(msg)}</div></div>`;
+  chat.appendChild(d); scrollDown();
+}
+
+function addTyping(){
+  const d = document.createElement("div");
+  d.className = "msg a"; d.id = "typingRow";
+  d.innerHTML = `<div class="who">AI</div><div class="bubble"><div class="typing" aria-label="正在生成"><i></i><i></i><i></i></div></div>`;
+  chat.appendChild(d); scrollDown();
+}
+function removeTyping(){ const e = $("#typingRow"); if (e) e.remove(); }
+
+function clearEmpty(){ const e = chat.querySelector(".empty"); if (e) e.remove(); }
+function scrollDown(){ chat.scrollTop = chat.scrollHeight; }
+
+async function send(rawText){
+  const text = (rawText != null ? rawText : input.value).trim();
+  if (!text || sendBtn.disabled) return;
+  const built = (rawText != null) ? "" : buildTeacherInput();
+  const payloadMsg = (persona === "teacher" && built) ? built : text;
+  addUser(payloadMsg);
+  input.value = "";
+  sendBtn.disabled = true; sendBtn.textContent = "思考中…";
+  addTyping();
+  try{
+    const res = await fetch("/api/chat", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ persona, message: payloadMsg, session_id: sessionId })
+    });
+    let data = null;
+    try { data = await res.json(); } catch(_){ data = null; }
+    if (!data){
+      addError("服务返回了空响应。" + connectionHelp());
+      markOffline();
+    } else if (!res.ok){
+      addError(data.error || ("HTTP " + res.status)); setQuota(data.quota);
+    } else {
+      addAgent(data); setQuota(data.quota);
+    }
+  }catch(e){
+    addError("无法连接到服务（" + e.message + "）。" + connectionHelp());
+    markOffline();
+  }
+  finally{ removeTyping(); sendBtn.disabled = false; sendBtn.textContent = "发送"; }
+}
+
+/* 快捷提问渲染（随端别切换） */
+function renderExamples(){
+  const box = $("#examples");
+  const list = EXAMPLES[persona] || [];
+  box.innerHTML = `<div class="lbl"><b>快捷提问</b> · <span class="tip">${esc(EX_TIP[persona]||"")}</span></div>
+    <div class="ex">${list.map((x,i)=>
+      `<button data-i="${i}" class="${x.edge?"edge":""}" title="点击直接发送">${esc(x.t)}${x.tag?`<span class="tag">${esc(x.tag)}</span>`:""}</button>`
+    ).join("")}</div>`;
+  box.querySelectorAll("button").forEach(b => b.onclick = () => {
+    if (sendBtn.disabled) return;
+    send(list[+b.dataset.i].full);
+  });
+}
+
+/* 教师端：三条字段拼成结构化输入 */
+function buildTeacherInput(){
+  const q = $("#fQ").value.trim(), a = $("#fA").value.trim(), s = $("#fS").value.trim();
+  if (!q && !a && !s) return "";
+  return `【题目】\n${q}\n\n【参考答案】\n${a}\n\n【学生作答】\n${s}\n`;
+}
+
+/* 交互绑定 */
+document.querySelectorAll(".tab").forEach(t => t.onclick = () => {
+  document.querySelectorAll(".tab").forEach(x => {
+    x.classList.remove("on"); x.setAttribute("aria-selected", "false");
+  });
+  t.classList.add("on"); t.setAttribute("aria-selected", "true");
+  persona = t.dataset.persona;
+  $("#rule").innerHTML = RULES[persona];
+  $("#tbox").classList.toggle("show", persona === "teacher");
+  input.placeholder = TIPS[persona];
+  chat.innerHTML = `<div class="empty">已切换到 <b>${t.querySelector(".tt b").textContent}</b>。${esc(TIPS[persona])}</div>`;
+  renderExamples();
+});
+
+sendBtn.onclick = () => send();
+input.addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey){ e.preventDefault(); send(); }
+});
+$("#reset").onclick = async () => {
+  await fetch("/api/reset", {method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({session_id: sessionId, persona})});
+  sessionId = createSessionId();
+  chat.innerHTML = `<div class="empty">会话已清空。</div>`;
+};
+$("#btnFill").onclick = () => {
+  const built = buildTeacherInput();
+  if (!built) { alert("请先填写题目/参考答案/学生作答，或从上方选一条内置样例。"); return; }
+  input.value = built; input.focus();
+};
+
+/* 初始化 */
+(async () => {
+  $("#rule").innerHTML = RULES.teacher;
+  input.placeholder = TIPS.teacher;
+  renderExamples();
+  try{
+    const h = await (await fetch("/api/health")).json();
+    $("#casePill").textContent = "样例 " + h.cases + " 条";
+    $("#keyPill").textContent = h.has_key ? "接口就绪" : "缺少 API Key";
+    $("#keyPill").className = "pill " + (h.has_key ? "ok" : "bad");
+    setQuota(h.quota);
+  }catch(e){ $("#keyPill").textContent = "服务未响应"; $("#keyPill").className = "pill bad"; }
+
+  try{
+    const c = await (await fetch("/api/cases")).json();
+    const sel = $("#caseSel");
+    sel.innerHTML = `<option value="">— 选择内置样例 —</option>` +
+      c.cases.map(x => `<option value="${x.id}">${x.id} · ${esc(x.topic)}</option>`).join("");
+    sel.onchange = () => {
+      const x = c.cases.find(v => v.id === sel.value);
+      if (!x) return;
+      $("#fQ").value = x.question || "";
+      $("#fA").value = x.reference_answer || "";
+      $("#fS").value = x.student_answer || "";
+    };
+  }catch(e){}
+})();
+</script>
+</body>
+</html>
