@@ -1,0 +1,44 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#183b32"><title>当前原型流程 · ChemAI</title><style>
+:root{--ink:#183b32;--muted:#61766d;--line:#dce7df;--accent:#16735c;--wash:#eef5ef;--paper:#fff;--bg:#f4f7f4}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.82 system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif}
+a{color:var(--accent);text-decoration-thickness:1px;text-underline-offset:3px}a:hover{color:#0b4b3b}.topbar{height:64px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 max(24px,calc((100vw - 1240px)/2));position:sticky;top:0;z-index:5}.brand{font-weight:750;letter-spacing:.02em;color:var(--ink);text-decoration:none}.toplinks{display:flex;gap:22px;font-size:14px}.toplinks a{text-decoration:none}.layout{max-width:1240px;margin:34px auto 70px;padding:0 22px;display:grid;grid-template-columns:250px minmax(0,1fr);gap:28px;align-items:start}.sidebar{position:sticky;top:88px}.sidecard,.paper{background:var(--paper);border:1px solid var(--line);border-radius:16px;box-shadow:0 12px 36px rgba(24,59,50,.045)}.sidecard{padding:20px 18px}.side-label{font-size:12px;font-weight:750;letter-spacing:.12em;color:var(--muted);margin:0 0 12px}.docnav{display:grid;gap:4px;margin-bottom:24px}.docnav a{padding:8px 10px;border-radius:9px;text-decoration:none;font-size:14px;color:var(--ink)}.docnav a.active,.docnav a:hover{background:var(--wash);color:var(--accent)}.toc{font-size:13px;line-height:1.55;max-height:58vh;overflow:auto}.toc ul{list-style:none;padding-left:12px;margin:6px 0}.toc>ul{padding-left:0}.toc a{display:block;padding:3px 0;color:var(--muted);text-decoration:none}.toc a:hover{color:var(--accent)}.main{min-width:0}.eyebrow{font-size:12px;font-weight:750;letter-spacing:.13em;color:var(--accent)}.page-intro{padding:20px 8px 18px}.page-intro p{margin:5px 0;color:var(--muted);font-size:14px}.paper{padding:clamp(26px,5vw,62px);overflow:hidden}.paper h1{font-size:clamp(30px,4vw,42px);line-height:1.25;letter-spacing:-.03em;margin:0 0 24px;color:var(--ink)}.paper h2{font-size:25px;line-height:1.35;margin:50px 0 18px;padding-top:22px;border-top:1px solid var(--line);scroll-margin-top:90px}.paper h3{font-size:19px;margin:30px 0 12px;scroll-margin-top:90px}.paper h4{font-size:16px;margin:24px 0 8px}.paper p{margin:12px 0}.paper strong{color:#173f34}.paper blockquote{margin:18px 0;padding:14px 18px;background:#f1f6f1;border-left:4px solid #6aa58f;border-radius:0 10px 10px 0;color:#47635a}.paper blockquote p{margin:4px 0}.paper ul,.paper ol{padding-left:1.4em}.paper li{margin:6px 0}.paper table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:14px;display:block;overflow-x:auto}.paper th,.paper td{padding:11px 13px;vertical-align:top;border-right:1px solid var(--line);border-bottom:1px solid var(--line);min-width:110px}.paper th{background:var(--wash);text-align:left;color:var(--ink);font-weight:700}.paper tr:last-child td{border-bottom:0}.paper th:last-child,.paper td:last-child{border-right:0}.paper pre{background:#17352e;color:#ecf4ef;padding:18px;border-radius:10px;overflow:auto;font-size:13px;line-height:1.65}.paper code{font:.9em ui-monospace,SFMono-Regular,Consolas,monospace;background:#f0f4f0;padding:2px 5px;border-radius:4px}.paper pre code{background:transparent;padding:0;color:inherit}.paper hr{border:0;border-top:1px solid var(--line);margin:32px 0}.paper img{max-width:100%;height:auto}.footer{padding:18px 8px;color:var(--muted);font-size:13px}.footer a{text-decoration:none}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{position:static}.toc{max-height:none}.docnav{grid-template-columns:repeat(2,minmax(0,1fr))}.topbar{padding:0 20px}}
+@media(max-width:600px){body{font-size:15px}.layout{padding:0 12px;margin:18px auto 42px;gap:12px}.topbar{height:56px}.toplinks{gap:12px;font-size:12px}.sidecard{padding:14px}.paper{padding:22px 17px;border-radius:12px}.paper h2{font-size:21px;margin-top:38px}.paper table{font-size:13px}}
+</style></head><body><header class="topbar"><a class="brand" href="../">ChemAI · 智辅化学</a><nav class="toplinks"><a href="../">作品集</a><a href="https://chemai-study-demo.sleepearly26.chatgpt.site/" target="_blank" rel="noopener">在线体验 ↗</a><a href="https://github.com/Zhuoer-Shi/ChemAI-chemistry-learning-assistant">GitHub ↗</a></nav></header><div class="layout"><aside class="sidebar"><div class="sidecard"><p class="side-label">CHEMAI · 文档中心</p><nav class="docnav"><a href="README.html" data-doc="README.html">阅读导航</a><a href="PRD-ChemAI.html" data-doc="PRD-ChemAI.html">产品 PRD</a><a href="flows.html" data-doc="flows.html">核心流程</a><a href="迭代复盘.html" data-doc="迭代复盘.html">迭代复盘</a></nav><p class="side-label">本页目录</p><div class="toc"><div class="toc">
+<ul>
+<li><a href="#chemai">ChemAI · 当前原型流程</a><ul>
+<li><a href="#_1">一次对话</a></li>
+<li><a href="#_2">工具与数据</a></li>
+<li><a href="#_3">信任与权限边界</a></li>
+<li><a href="#_4">规划流程</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div></div></aside><main class="main"><div class="page-intro"><div class="eyebrow">PRODUCT FLOW · CORE DOCUMENT</div><p>独立项目文档 · 当前原型与规划范围清晰区分</p></div><article class="paper"><h1 id="chemai">ChemAI · 当前原型流程</h1>
+<p>本页描述当前代码行为。OCR、完整教学闭环与生产权限属于规划，历史设计见<a href="../附录/README.html">附录</a>。</p>
+<h2 id="_1">一次对话</h2>
+<pre><code class="language-mermaid">flowchart TD
+A[选择角色、会话 ID 并输入文本] --&gt; B[校验角色、输入与额度]
+    B --&gt; C[组装系统提示和本次输入]
+    C --&gt; D[调用模型]
+    D --&gt; E{请求工具?}
+    E --&gt;|是| F[检查工具是否向当前角色开放]
+    F --&gt; G[返回工具结果或拒绝信息]
+    G --&gt; D
+    E --&gt;|否| H[检测输出风险]
+    H --&gt; I[返回原回答、风险标记和工具轨迹]
+</code></pre>
+<p>工具循环有轮数上限，达到上限后要求模型输出最终回答。风险检测不阻断原回答。</p>
+<h2 id="_2">工具与数据</h2>
+<ul>
+<li><code>kb_search</code>：本地关键词检索，不是向量检索。</li>
+<li><code>student_profile</code>：示例学生档案，不是实际学生记录。</li>
+<li><code>class_overview</code>：仅教师角色可调用，返回示例班级信息。</li>
+<li><code>request_more_info</code>：记录信息缺口并返回提示，不会自动联系用户。</li>
+</ul>
+<p>模型上下文包含系统提示、同一会话和角色最近最多 8 条用户/助手消息、本次输入及本次工具结果。历史窗口上限为 12,000 字符；会话在内存中，重启后清空。</p>
+<h2 id="_3">信任与权限边界</h2>
+<p>角色由请求参数选择，工具检查只约束该参数对应的工具集，不代表真实身份验证。客户端未提供会话 ID 时服务会新建并在响应中返回；ID 用来续接上下文，不是身份凭据。输入会发送至所配置的模型服务；当前演示使用自建样例。教师人工复核是使用环节，不是已经实现的审批系统。</p>
+<h2 id="_4">规划流程</h2>
+<p>答题卡 OCR → 错因分析 → 教师确认 → 针对性练习 → 学习反馈。该闭环尚未贯通，不能作为现场演示步骤。</p></article><div class="footer"><a href="../">← 返回作品集</a>　·　<a href="https://github.com/Zhuoer-Shi/ChemAI-chemistry-learning-assistant/blob/main/ChemAI-%E4%BA%A4%E4%BB%98%E6%96%87%E6%A1%A3/flows.md" target="_blank" rel="noopener">查看 Markdown 源稿 ↗</a></div></main></div><script>document.querySelectorAll('.docnav a').forEach(a=>{if(a.dataset.doc==='flows.html')a.classList.add('active')});</script></body></html>

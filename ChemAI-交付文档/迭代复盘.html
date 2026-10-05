@@ -1,0 +1,59 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#183b32"><title>迭代复盘 · ChemAI</title><style>
+:root{--ink:#183b32;--muted:#61766d;--line:#dce7df;--accent:#16735c;--wash:#eef5ef;--paper:#fff;--bg:#f4f7f4}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.82 system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif}
+a{color:var(--accent);text-decoration-thickness:1px;text-underline-offset:3px}a:hover{color:#0b4b3b}.topbar{height:64px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 max(24px,calc((100vw - 1240px)/2));position:sticky;top:0;z-index:5}.brand{font-weight:750;letter-spacing:.02em;color:var(--ink);text-decoration:none}.toplinks{display:flex;gap:22px;font-size:14px}.toplinks a{text-decoration:none}.layout{max-width:1240px;margin:34px auto 70px;padding:0 22px;display:grid;grid-template-columns:250px minmax(0,1fr);gap:28px;align-items:start}.sidebar{position:sticky;top:88px}.sidecard,.paper{background:var(--paper);border:1px solid var(--line);border-radius:16px;box-shadow:0 12px 36px rgba(24,59,50,.045)}.sidecard{padding:20px 18px}.side-label{font-size:12px;font-weight:750;letter-spacing:.12em;color:var(--muted);margin:0 0 12px}.docnav{display:grid;gap:4px;margin-bottom:24px}.docnav a{padding:8px 10px;border-radius:9px;text-decoration:none;font-size:14px;color:var(--ink)}.docnav a.active,.docnav a:hover{background:var(--wash);color:var(--accent)}.toc{font-size:13px;line-height:1.55;max-height:58vh;overflow:auto}.toc ul{list-style:none;padding-left:12px;margin:6px 0}.toc>ul{padding-left:0}.toc a{display:block;padding:3px 0;color:var(--muted);text-decoration:none}.toc a:hover{color:var(--accent)}.main{min-width:0}.eyebrow{font-size:12px;font-weight:750;letter-spacing:.13em;color:var(--accent)}.page-intro{padding:20px 8px 18px}.page-intro p{margin:5px 0;color:var(--muted);font-size:14px}.paper{padding:clamp(26px,5vw,62px);overflow:hidden}.paper h1{font-size:clamp(30px,4vw,42px);line-height:1.25;letter-spacing:-.03em;margin:0 0 24px;color:var(--ink)}.paper h2{font-size:25px;line-height:1.35;margin:50px 0 18px;padding-top:22px;border-top:1px solid var(--line);scroll-margin-top:90px}.paper h3{font-size:19px;margin:30px 0 12px;scroll-margin-top:90px}.paper h4{font-size:16px;margin:24px 0 8px}.paper p{margin:12px 0}.paper strong{color:#173f34}.paper blockquote{margin:18px 0;padding:14px 18px;background:#f1f6f1;border-left:4px solid #6aa58f;border-radius:0 10px 10px 0;color:#47635a}.paper blockquote p{margin:4px 0}.paper ul,.paper ol{padding-left:1.4em}.paper li{margin:6px 0}.paper table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:14px;display:block;overflow-x:auto}.paper th,.paper td{padding:11px 13px;vertical-align:top;border-right:1px solid var(--line);border-bottom:1px solid var(--line);min-width:110px}.paper th{background:var(--wash);text-align:left;color:var(--ink);font-weight:700}.paper tr:last-child td{border-bottom:0}.paper th:last-child,.paper td:last-child{border-right:0}.paper pre{background:#17352e;color:#ecf4ef;padding:18px;border-radius:10px;overflow:auto;font-size:13px;line-height:1.65}.paper code{font:.9em ui-monospace,SFMono-Regular,Consolas,monospace;background:#f0f4f0;padding:2px 5px;border-radius:4px}.paper pre code{background:transparent;padding:0;color:inherit}.paper hr{border:0;border-top:1px solid var(--line);margin:32px 0}.paper img{max-width:100%;height:auto}.footer{padding:18px 8px;color:var(--muted);font-size:13px}.footer a{text-decoration:none}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{position:static}.toc{max-height:none}.docnav{grid-template-columns:repeat(2,minmax(0,1fr))}.topbar{padding:0 20px}}
+@media(max-width:600px){body{font-size:15px}.layout{padding:0 12px;margin:18px auto 42px;gap:12px}.topbar{height:56px}.toplinks{gap:12px;font-size:12px}.sidecard{padding:14px}.paper{padding:22px 17px;border-radius:12px}.paper h2{font-size:21px;margin-top:38px}.paper table{font-size:13px}}
+</style></head><body><header class="topbar"><a class="brand" href="../">ChemAI · 智辅化学</a><nav class="toplinks"><a href="../">作品集</a><a href="https://chemai-study-demo.sleepearly26.chatgpt.site/" target="_blank" rel="noopener">在线体验 ↗</a><a href="https://github.com/Zhuoer-Shi/ChemAI-chemistry-learning-assistant">GitHub ↗</a></nav></header><div class="layout"><aside class="sidebar"><div class="sidecard"><p class="side-label">CHEMAI · 文档中心</p><nav class="docnav"><a href="README.html" data-doc="README.html">阅读导航</a><a href="PRD-ChemAI.html" data-doc="PRD-ChemAI.html">产品 PRD</a><a href="flows.html" data-doc="flows.html">核心流程</a><a href="迭代复盘.html" data-doc="迭代复盘.html">迭代复盘</a></nav><p class="side-label">本页目录</p><div class="toc"><div class="toc">
+<ul>
+<li><a href="#chemai">ChemAI 迭代复盘</a><ul>
+<li><a href="#_1">问题与改动</a></li>
+<li><a href="#_2">观察结果</a></li>
+<li><a href="#_3">失败案例如何看</a></li>
+<li><a href="#_4">方法局限</a></li>
+<li><a href="#_5">下一轮计划（未执行）</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div></div></aside><main class="main"><div class="page-intro"><div class="eyebrow">EVALUATION REVIEW · CORE DOCUMENT</div><p>独立项目文档 · 当前原型与规划范围清晰区分</p></div><article class="paper"><h1 id="chemai">ChemAI 迭代复盘</h1>
+<p>本文基于 2026-10-05 的六轮原始评测记录整理。未重新调用模型，未开展真实教师试用。</p>
+<h2 id="_1">问题与改动</h2>
+<p>v1 教师提示较宽松，v2 增加证据引用、信息不足追问、禁止越界判断与固定六节输出要求。两版都叠加角色规则和工具协议。规则检查仅覆盖六节中的四个关键词，不能称为六节完整结构验收。</p>
+<h2 id="_2">观察结果</h2>
+<p>同一组 15 条自建样例，每版运行三轮。v1/v2 裁判通过数为 37/45 与 40/45；四个指定小节关键词齐全数为 0/45 与 45/45；平均模型调用累计耗时为 2.04 秒与 3.59 秒。</p>
+<p>数据与计算口径见<a href="../eval/实验结果汇总.html">实验汇总</a>。重复运行没有增加独立题目数，不用于证明泛化或教学效果。</p>
+<h2 id="_3">失败案例如何看</h2>
+<table>
+<thead>
+<tr>
+<th>案例</th>
+<th>已有记录</th>
+<th>下一步复核</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C03</td>
+<td>v2 最后一轮裁判以 F5 判失败，理由涉及模型对条件和歧义的处理</td>
+<td>对照题干、预期行为和原回答，请学科教师判断裁判标准是否合理</td>
+</tr>
+<tr>
+<td>C09</td>
+<td>v2 最后一轮裁判以 F1 判失败，理由涉及等价表述与虚构问题</td>
+<td>验证化学表述是否等价，以及模型是否引入题目之外的前提</td>
+</tr>
+</tbody>
+</table>
+<p>这些是裁判记录，不是已经过教师确认的错误归因。见<a href="../eval/runs/20261005-022144_v2/report.html">该轮报告</a>与<a href="../eval/runs/20261005-022144_v2/results.jsonl">原始输出</a>。</p>
+<h2 id="_4">方法局限</h2>
+<ul>
+<li>输入提前提供参考答案与歧义类型，尚未验证模型独立识别信息缺失的能力。</li>
+<li>v1 没有固定结构要求，结构分数提升主要说明格式要求得到遵循。</li>
+<li>引用信号实际检查引号，追问信号实际检查关键词，均未完成语义验收。</li>
+<li>当前没有独立留出集、教师人工金标准，也没有足够证据作显著性结论。</li>
+<li>耗时只累计模型请求，不代表用户在网页上的完整等待时间。</li>
+</ul>
+<h2 id="_5">下一轮计划（未执行）</h2>
+<p>先邀请教师体验，记录采纳、驳回与复核耗时；再扩充独立样例，增加去掉歧义标签的对照和教师盲评。根据结果决定是否优先建设 OCR、真实档案与后续练习闭环。</p>
+<p>工程上待补输出阻断和身份鉴权；新加入的有限历史上下文仍需在连续对话中评估相关性、截断体验和错误信息沿用风险。</p></article><div class="footer"><a href="../">← 返回作品集</a>　·　<a href="https://github.com/Zhuoer-Shi/ChemAI-chemistry-learning-assistant/blob/main/ChemAI-%E4%BA%A4%E4%BB%98%E6%96%87%E6%A1%A3/%E8%BF%AD%E4%BB%A3%E5%A4%8D%E7%9B%98.md" target="_blank" rel="noopener">查看 Markdown 源稿 ↗</a></div></main></div><script>document.querySelectorAll('.docnav a').forEach(a=>{if(a.dataset.doc==='迭代复盘.html')a.classList.add('active')});</script></body></html>
